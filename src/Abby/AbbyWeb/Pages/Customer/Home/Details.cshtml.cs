@@ -40,10 +40,19 @@ namespace AbbyWeb.Pages.Customer.Home
         {
             if (ModelState.IsValid)
             {
+                ShoppingCart shoppingCartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
+                    filter: u => u.ApplicationUserId == ShoppingCart.ApplicationUserId &&
+                    u.MenuItemId == ShoppingCart.MenuItemId);
 
-
-                _unitOfWork.ShoppingCart.Add(ShoppingCart);
-                _unitOfWork.Save();
+                if (shoppingCartFromDb == null)
+                {
+                    _unitOfWork.ShoppingCart.Add(ShoppingCart);
+                    _unitOfWork.Save();
+                }
+                else 
+                { 
+                    _unitOfWork.ShoppingCart.IncrementCount(shoppingCartFromDb, ShoppingCart.Count);
+                }
 
                 return RedirectToPage("Index");
             }
